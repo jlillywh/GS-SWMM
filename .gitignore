@@ -1,6 +1,9 @@
 # Kiro IDE configuration
 .kiro/
 
+# Build scripts (project-specific)
+scripts/
+
 # Build artifacts
 *.obj
 *.exp
