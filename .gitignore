@@ -1,3 +1,6 @@
+# Kiro IDE configuration
+.kiro/
+
 # Build artifacts
 *.obj
 *.exp
