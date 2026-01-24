@@ -2,15 +2,7 @@
 
 A DLL bridge that enables GoldSim simulation software to control EPA SWMM hydraulic simulations, pass rainfall inputs, and receive runoff calculations.
 
-## Version 1.04 - Enhanced Validation and Visualization
-
-**New in 1.04:**
-- ✅ **Input file validation** in `generate_mapping.py` catches common errors before runtime
-- ✅ **Visual diagram generation** with `generate_diagram.py` creates Mermaid.js diagrams
-- ✅ **Performance optimization** - logging disabled by default for faster simulations
-- ✅ **Enhanced error reporting** - detailed SWMM error messages in logs
-
-**Previous (1.03):** Dynamic interface configuration through mapping files
+Latest Version: 1.04 
 
 ## Quick Start
 
