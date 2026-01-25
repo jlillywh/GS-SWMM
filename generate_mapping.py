@@ -45,7 +45,7 @@ class OutputElement:
     
     Attributes:
         name: Element name from SWMM
-        object_type: SWMM object type ("STORAGE", "OUTFALL", "ORIFICE", "WEIR", "SUBCATCH")
+        object_type: SWMM object type ("STORAGE", "OUTFALL", "ORIFICE", "WEIR", "PUMP", "SUBCATCH")
         value_type: Type of value being reported ("VOLUME", "FLOW", "RUNOFF")
         index: Interface index in the GoldSim outargs array (0-based)
     """
@@ -703,7 +703,8 @@ def discover_outputs(sections: Dict[str, List[List[str]]]) -> List[OutputElement
     2. Outfalls (flow)
     3. Orifices (flow)
     4. Weirs (flow)
-    5. Subcatchments (runoff)
+    5. Pumps (flow)
+    6. Subcatchments (runoff)
     
     Within each section, the order from the .inp file is preserved (Requirement 3.7).
     
@@ -788,7 +789,25 @@ def discover_outputs(sections: Dict[str, List[List[str]]]) -> List[OutputElement
         outputs.append(output)
         next_index += 1
     
-    # Priority 5: Subcatchments - report runoff flow rate (Requirement 3.5)
+    # Priority 5: Pumps - report current flow rate
+    pumps = sections.get('PUMPS', [])
+    for pump_line in pumps:
+        # PUMPS format: Name FromNode ToNode PumpCurve ...
+        # We need at least the name (first field)
+        if len(pump_line) < 1:
+            continue
+        
+        pump_name = pump_line[0]
+        output = OutputElement(
+            name=pump_name,
+            object_type="PUMP",
+            value_type="FLOW",
+            index=next_index
+        )
+        outputs.append(output)
+        next_index += 1
+    
+    # Priority 6: Subcatchments - report runoff flow rate (Requirement 3.5)
     subcatchments = sections.get('SUBCATCHMENTS', [])
     for subcatch_line in subcatchments:
         # SUBCATCHMENTS format: Name RainGage Outlet Area ...
@@ -891,6 +910,7 @@ def generate_mapping_file(
         # Build the mapping dictionary structure
         mapping = {
             "version": "1.0",
+            "logging_level": "NONE",
             "inp_file_hash": content_hash,
             "input_count": len(inputs),
             "output_count": len(outputs),

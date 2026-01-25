@@ -125,14 +125,14 @@ int main()
     std::cout << "Test 1: XF_REP_VERSION" << std::endl;
     test_count++;
     SwmmGoldSimBridge(XF_REP_VERSION, &status, inargs, outargs);
-    if (status == XF_SUCCESS && outargs[0] == 1.04)
+    if (status == XF_SUCCESS && outargs[0] == 1.05)
     {
         std::cout << "  [PASS] Version = " << outargs[0] << ", Status = " << status << std::endl;
         pass_count++;
     }
     else
     {
-        std::cout << "  [FAIL] Expected version 1.04 and status 0, got version " 
+        std::cout << "  [FAIL] Expected version 1.05 and status 0, got version " 
                   << outargs[0] << " and status " << status << std::endl;
     }
     std::cout << std::endl;

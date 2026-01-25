@@ -271,6 +271,7 @@ static bool parseOutputArray(const std::string& arrayJson,
 
 MappingLoader::MappingLoader()
     : inp_hash_("")
+    , logging_level_("NONE")
 {
 }
 
@@ -337,6 +338,16 @@ bool MappingLoader::LoadFromFile(const std::string& path, std::string& error) {
         return false;
     }
     inp_hash_ = extractString(hashStr);
+    
+    // Parse logging_level (optional, defaults to NONE)
+    std::string loggingLevelStr = findValue(json, "logging_level", error);
+    if (error.empty()) {
+        logging_level_ = extractString(loggingLevelStr);
+    } else {
+        // Default to NONE if not specified
+        logging_level_ = "NONE";
+        error.clear(); // Clear error since this field is optional
+    }
     
     // Parse input_count
     std::string inputCountStr = findValue(json, "input_count", error);
@@ -415,4 +426,8 @@ const std::vector<MappingLoader::OutputMapping>& MappingLoader::GetOutputs() con
 
 const std::string& MappingLoader::GetHash() const {
     return inp_hash_;
+}
+
+const std::string& MappingLoader::GetLoggingLevel() const {
+    return logging_level_;
 }

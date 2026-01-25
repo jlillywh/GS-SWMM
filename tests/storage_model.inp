@@ -24,13 +24,17 @@ FORCE_MAIN_EQUATION H-W
 LINK_OFFSETS DEPTH
 MIN_SLOPE 0
 
+[EVAPORATION]
+;;Data Source    Parameters
+CONSTANT        0.2
+
 [JUNCTIONS]
 ;;Name Elevation MaxDepth InitDepth SurDepth Aponded
 J1 100 10 0 0 0
 
 [STORAGE]
 ;;Name Elevation MaxDepth InitDepth Shape Curve_Name/Params Ponded_Area Evap
-POND1 95 25 0 FUNCTIONAL 1000 200 1 0
+POND1 95 25 0 FUNCTIONAL 1000 200 1 1
 
 [OUTFALLS]
 ;;Name Elevation Type Stage Data Gated Route To

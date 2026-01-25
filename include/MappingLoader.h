@@ -98,6 +98,9 @@ public:
     // Get INP file hash for validation
     // Requirements: 5.2, 7.5
     const std::string& GetHash() const;
+    
+    // Get logging level setting
+    const std::string& GetLoggingLevel() const;
 
 private:
     //-------------------------------------------------------------------------
@@ -106,6 +109,7 @@ private:
     std::vector<InputMapping> inputs_;      // Input element mappings
     std::vector<OutputMapping> outputs_;    // Output element mappings
     std::string inp_hash_;                  // Hash of INP file for validation
+    std::string logging_level_;             // Logging level: NONE, ERROR, INFO, DEBUG
 };
 
 #endif // MAPPING_LOADER_H

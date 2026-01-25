@@ -37,7 +37,7 @@ namespace GoldSim {
         FailureWithMessage = -1
     };
 
-    constexpr double VERSION = 1.04;
+    constexpr double VERSION = 1.05;
     constexpr int INPUT_COUNT = 2;   // ETime, Rainfall
     constexpr int OUTPUT_COUNT = 1;  // Runoff
     constexpr size_t ERROR_BUFFER_SIZE = 200;
@@ -82,24 +82,15 @@ public:
 };
 
 //=============================================================================
-// Logger Class - Handles debug logging with RAII
+// Logger Class - Handles debug logging with runtime level control
 //=============================================================================
 
 class Logger {
 private:
     static bool first_write_;
+    static std::string logging_level_;  // "NONE", "ERROR", "INFO", "DEBUG"
     
-    // Logging control: Set to false to disable all logging for production use
-    // This significantly improves performance by eliminating file I/O overhead
-    static constexpr bool ENABLE_LOGGING = false;
-    
-public:
-    static void Debug(const char* format, ...) {
-        // Skip logging if disabled
-        if (!ENABLE_LOGGING) {
-            return;
-        }
-        
+    static void WriteLog(const char* format, va_list args) {
         // Get DLL directory for log file
         std::string log_path = PathHelper::BuildDllRelativePath("bridge_debug.log");
         
@@ -114,19 +105,58 @@ public:
             fprintf(log_file, "[%02d:%02d:%02d.%03d] ", 
                     st.wHour, st.wMinute, st.wSecond, st.wMilliseconds);
             
-            va_list args;
-            va_start(args, format);
             vfprintf(log_file, format, args);
-            va_end(args);
             
             fprintf(log_file, "\n");
             fclose(log_file);
         }
     }
+    
+public:
+    static void SetLoggingLevel(const std::string& level) {
+        logging_level_ = level;
+    }
+    
+    static void Debug(const char* format, ...) {
+        // DEBUG level logs everything
+        if (logging_level_ != "DEBUG") {
+            return;
+        }
+        
+        va_list args;
+        va_start(args, format);
+        WriteLog(format, args);
+        va_end(args);
+    }
+    
+    static void Info(const char* format, ...) {
+        // INFO level logs info, errors (not debug)
+        if (logging_level_ != "INFO" && logging_level_ != "DEBUG") {
+            return;
+        }
+        
+        va_list args;
+        va_start(args, format);
+        WriteLog(format, args);
+        va_end(args);
+    }
+    
+    static void Error(const char* format, ...) {
+        // ERROR level logs only errors
+        if (logging_level_ == "NONE" || logging_level_ == "OFF") {
+            return;
+        }
+        
+        va_list args;
+        va_start(args, format);
+        WriteLog(format, args);
+        va_end(args);
+    }
 };
 
-// Initialize static member
+// Initialize static members
 bool Logger::first_write_ = true;
+std::string Logger::logging_level_ = "NONE";
 
 //=============================================================================
 // FileValidator - Validates file paths before SWMM operations
@@ -470,6 +500,8 @@ public:
                 swmm_property = swmm_LINK_FLOW;
             } else if (output.object_type == "WEIR" && output.property == "FLOW") {
                 swmm_property = swmm_LINK_FLOW;
+            } else if (output.object_type == "PUMP" && output.property == "FLOW") {
+                swmm_property = swmm_LINK_FLOW;
             } else if (output.object_type == "SUBCATCH" && output.property == "RUNOFF") {
                 swmm_property = swmm_SUBCATCH_RUNOFF;
             } else {
@@ -480,6 +512,7 @@ public:
                         "  - OUTFALL.FLOW\n" +
                         "  - ORIFICE.FLOW\n" +
                         "  - WEIR.FLOW\n" +
+                        "  - PUMP.FLOW\n" +
                         "  - SUBCATCH.RUNOFF";
                 Logger::Debug("ERROR: %s", error.c_str());
                 return false;
@@ -608,14 +641,14 @@ private:
             int swmm_obj_type = -1;
             if (output.object_type == "STORAGE" || output.object_type == "OUTFALL") {
                 swmm_obj_type = swmm_NODE;
-            } else if (output.object_type == "ORIFICE" || output.object_type == "WEIR") {
+            } else if (output.object_type == "ORIFICE" || output.object_type == "WEIR" || output.object_type == "PUMP") {
                 swmm_obj_type = swmm_LINK;
             } else if (output.object_type == "SUBCATCH") {
                 swmm_obj_type = swmm_SUBCATCH;
             } else {
                 error = "Error: Unknown output object type\n"
                         "Context: Type '" + output.object_type + "' for element '" + output.name + "'\n" +
-                        "Suggestion: Supported types are STORAGE, OUTFALL, ORIFICE, WEIR, SUBCATCH";
+                        "Suggestion: Supported types are STORAGE, OUTFALL, ORIFICE, WEIR, PUMP, SUBCATCH";
                 Logger::Debug("ERROR: %s", error.c_str());
                 return false;
             }
@@ -723,7 +756,7 @@ public:
                 break;
 
             default:
-                Logger::Debug("ERROR: Unknown method ID %d", method_id);
+                Logger::Error("ERROR: Unknown method ID %d", method_id);
                 *status = static_cast<int>(GoldSim::Status::Failure);
                 break;
         }
@@ -740,37 +773,41 @@ public:
 
 private:
     void HandleInitialize(int* status, double* outargs, std::string& error) {
-        // Log DLL version and initialization start
-        Logger::Debug("========================================");
-        Logger::Debug("GSswmm Bridge DLL Version %.2f", GoldSim::VERSION);
-        Logger::Debug("Initialization started");
-        Logger::Debug("========================================");
-        
         // Always reload mapping file on initialize to support dynamic testing
         const std::string mapping_file = "SwmmGoldSimBridge.json";
-        Logger::Debug("Loading mapping file: %s", mapping_file.c_str());
         
         if (!mapping_.LoadFromFile(mapping_file, error)) {
-            Logger::Debug("Failed to load mapping file: %s", error.c_str());
+            Logger::Error("Failed to load mapping file: %s", error.c_str());
             SetErrorMessage(outargs, error);
             *status = static_cast<int>(GoldSim::Status::FailureWithMessage);
             return;
         }
         
         mapping_loaded_ = true;
-        Logger::Debug("Mapping file loaded successfully");
-        Logger::Debug("  Input count: %d", mapping_.GetInputs().size());
-        Logger::Debug("  Output count: %d", mapping_.GetOutputs().size());
+        
+        // Set logging level from mapping file
+        Logger::SetLoggingLevel(mapping_.GetLoggingLevel());
+        
+        // Log DLL version and initialization start
+        Logger::Info("========================================");
+        Logger::Info("GSswmm Bridge DLL Version %.2f", GoldSim::VERSION);
+        Logger::Info("Initialization started");
+        Logger::Info("Logging level: %s", mapping_.GetLoggingLevel().c_str());
+        Logger::Info("========================================");
+        Logger::Info("Loading mapping file: %s", mapping_file.c_str());
+        Logger::Info("Mapping file loaded successfully");
+        Logger::Info("  Input count: %d", mapping_.GetInputs().size());
+        Logger::Info("  Output count: %d", mapping_.GetOutputs().size());
         
         if (simulation_.Initialize(mapping_, error)) {
-            Logger::Debug("========================================");
-            Logger::Debug("Initialization SUCCESSFUL");
-            Logger::Debug("========================================");
+            Logger::Info("========================================");
+            Logger::Info("Initialization SUCCESSFUL");
+            Logger::Info("========================================");
             *status = static_cast<int>(GoldSim::Status::Success);
         } else {
-            Logger::Debug("========================================");
-            Logger::Debug("Initialization FAILED: %s", error.c_str());
-            Logger::Debug("========================================");
+            Logger::Error("========================================");
+            Logger::Error("Initialization FAILED: %s", error.c_str());
+            Logger::Error("========================================");
             SetErrorMessage(outargs, error);
             *status = static_cast<int>(GoldSim::Status::FailureWithMessage);
         }
@@ -783,30 +820,30 @@ private:
         // Load mapping file if not already loaded
         if (!mapping_loaded_) {
             const std::string mapping_file = "SwmmGoldSimBridge.json";
-            Logger::Debug("Loading mapping file: %s", mapping_file.c_str());
             
             if (!mapping_.LoadFromFile(mapping_file, error)) {
-                Logger::Debug("Failed to load mapping file: %s", error.c_str());
+                Logger::Error("Failed to load mapping file: %s", error.c_str());
                 SetErrorMessage(outargs, error);
                 *status = static_cast<int>(GoldSim::Status::FailureWithMessage);
                 return;
             }
             
             mapping_loaded_ = true;
-            Logger::Debug("Mapping file loaded successfully");
+            Logger::SetLoggingLevel(mapping_.GetLoggingLevel());
+            Logger::Info("Mapping file loaded successfully");
         }
 
         // Log detailed info for first call
         if (is_first_call) {
-            Logger::Debug("========================================");
-            Logger::Debug("FIRST TIMESTEP - Calculate call #%d", calculate_call_count_);
-            Logger::Debug("========================================");
+            Logger::Info("========================================");
+            Logger::Info("FIRST TIMESTEP - Calculate call #%d", calculate_call_count_);
+            Logger::Info("========================================");
             
             // Log all inputs
             const std::vector<MappingLoader::InputMapping>& inputs = mapping_.GetInputs();
-            Logger::Debug("Input values from GoldSim:");
+            Logger::Info("Input values from GoldSim:");
             for (size_t i = 0; i < inputs.size(); i++) {
-                Logger::Debug("  [%d] %s = %.6f", 
+                Logger::Info("  [%d] %s = %.6f", 
                              static_cast<int>(i), inputs[i].name.c_str(), inargs[i]);
             }
         }
@@ -815,12 +852,12 @@ private:
             // Log detailed info for first call
             if (is_first_call) {
                 const std::vector<MappingLoader::OutputMapping>& outputs = mapping_.GetOutputs();
-                Logger::Debug("Output values to GoldSim:");
+                Logger::Info("Output values to GoldSim:");
                 for (size_t i = 0; i < outputs.size(); i++) {
-                    Logger::Debug("  [%d] %s = %.6f", 
+                    Logger::Info("  [%d] %s = %.6f", 
                                  static_cast<int>(i), outputs[i].name.c_str(), outargs[i]);
                 }
-                Logger::Debug("========================================");
+                Logger::Info("========================================");
             }
             
             last_logged_time_ = inargs[0];
@@ -828,13 +865,13 @@ private:
         } else {
             // If SWMM is not running, it means simulation ended - log final state
             if (!simulation_.IsRunning() && error == "SWMM not running") {
-                Logger::Debug("========================================");
-                Logger::Debug("SIMULATION ENDED - Calculate call #%d", calculate_call_count_);
-                Logger::Debug("Last elapsed time: %.2f seconds", last_logged_time_);
-                Logger::Debug("========================================");
+                Logger::Info("========================================");
+                Logger::Info("SIMULATION ENDED - Calculate call #%d", calculate_call_count_);
+                Logger::Info("Last elapsed time: %.2f seconds", last_logged_time_);
+                Logger::Info("========================================");
                 *status = static_cast<int>(GoldSim::Status::Failure);
             } else {
-                Logger::Debug("Calculate FAILED: %s", error.c_str());
+                Logger::Error("Calculate FAILED: %s", error.c_str());
                 SetErrorMessage(outargs, error);
                 *status = static_cast<int>(GoldSim::Status::FailureWithMessage);
             }
@@ -842,7 +879,7 @@ private:
     }
 
     void HandleReportVersion(double* outargs) {
-        Logger::Debug("Returning version %.2f", GoldSim::VERSION);
+        Logger::Info("Returning version %.2f", GoldSim::VERSION);
         outargs[0] = GoldSim::VERSION;
     }
 
@@ -850,39 +887,39 @@ private:
         // Load mapping file if not already loaded
         if (!mapping_loaded_) {
             const std::string mapping_file = "SwmmGoldSimBridge.json";
-            Logger::Debug("Loading mapping file: %s", mapping_file.c_str());
             
             if (!mapping_.LoadFromFile(mapping_file, error)) {
-                Logger::Debug("Failed to load mapping file: %s", error.c_str());
+                Logger::Error("Failed to load mapping file: %s", error.c_str());
                 SetErrorMessage(outargs, error);
                 *status = static_cast<int>(GoldSim::Status::FailureWithMessage);
                 return;
             }
             
             mapping_loaded_ = true;
-            Logger::Debug("Mapping file loaded successfully");
+            Logger::SetLoggingLevel(mapping_.GetLoggingLevel());
+            Logger::Info("Mapping file loaded successfully");
         }
         
         int input_count = mapping_.GetInputCount();
         int output_count = mapping_.GetOutputCount();
         
-        Logger::Debug("Returning %d inputs, %d outputs", input_count, output_count);
+        Logger::Info("Returning %d inputs, %d outputs", input_count, output_count);
         outargs[0] = static_cast<double>(input_count);
         outargs[1] = static_cast<double>(output_count);
         *status = static_cast<int>(GoldSim::Status::Success);
     }
 
     void HandleCleanup(int* status, double* outargs, std::string& error) {
-        Logger::Debug("========================================");
-        Logger::Debug("CLEANUP - Closing SWMM simulation");
-        Logger::Debug("Total Calculate calls: %d", calculate_call_count_);
-        Logger::Debug("========================================");
+        Logger::Info("========================================");
+        Logger::Info("CLEANUP - Closing SWMM simulation");
+        Logger::Info("Total Calculate calls: %d", calculate_call_count_);
+        Logger::Info("========================================");
         
         if (simulation_.Cleanup()) {
-            Logger::Debug("Cleanup SUCCESSFUL");
+            Logger::Info("Cleanup SUCCESSFUL");
             *status = static_cast<int>(GoldSim::Status::Success);
         } else {
-            Logger::Debug("Cleanup FAILED");
+            Logger::Error("Cleanup FAILED");
             SetErrorMessage(outargs, simulation_.GetErrorMessage());
             *status = static_cast<int>(GoldSim::Status::FailureWithMessage);
         }
