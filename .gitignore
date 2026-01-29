@@ -1,0 +1,153 @@
+# Visual Studio Build Artifacts
+*.obj
+*.exe
+*.pdb
+*.ilk
+*.iobj
+*.ipdb
+*.log
+*.tlog
+*.lastbuildstate
+*.recipe
+*.vcxproj.FileListAbsolute.txt
+
+# Build Directories
+x64/
+.vs/
+GSswmm/x64/
+Debug/
+Release/
+
+# SWMM Output Files
+*.out
+*.rpt
+model.out
+model.rpt
+tests/model.out
+tests/model.rpt
+
+# Log Files
+*.log
+bridge_debug.log
+tests/bridge_debug.log
+scripts/build_output.log
+
+# Temporary Files
+*.tmp
+*.temp
+~$*
+
+# Windows System Files
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# IDE Files
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build Results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Ww][Ii][Nn]32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+# Visual Studio Cache/Options
+.vs/
+.vscode/
+
+# ReSharper
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
+
+# Test Results
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+
+# NCrunch
+_NCrunch_*
+.*crunch*.local.xml
+nCrunchTemp_*
+
+# NuGet
+*.nupkg
+*.snupkg
+**/packages/*
+!**/packages/build/
+
+# Backup Files
+*.bak
+*.backup
+*_backup.*
+model_backup.inp
+
+# Distribution Files (keep source, ignore built)
+# Keep: GSswmm.dll, swmm5.dll in root for distribution
+# Ignore: Build artifacts
+
+# Documentation Build
+docs/_build/
+docs/.doctrees/
+
+# Python (if any scripts)
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Linux
+*~
+.directory
+
+# Ignore test executables but keep source
+tests/*.exe
+tests/*.obj
+
+# Keep Important Files (override ignores)
+!README.md
+!CHANGELOG.md
+!LICENSE
+!.gitignore
+!*.md
+!*.h
+!*.cpp
+!*.bat
+!*.ps1
+!*.inp
+!*.txt
+
+# Keep DLLs in specific locations for distribution
+!GSswmm.dll
+!swmm5.dll
+!lib/*.lib
+!lib/*.dll
+
+# Keep test source files
+!tests/*.cpp
+!tests/*.h
+!tests/*.bat
+!tests/*.ps1
+!tests/*.md
+!tests/*.inp
