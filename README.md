@@ -50,14 +50,16 @@ This creates `SwmmGoldSimBridge.json` with:
   - Pumps, Orifices, Weirs → FLOW
   - Subcatchments → RUNOFF
 
-**Add controllable inputs:**
+**Specify controllable inputs:**
 ```bash
-# Control rainfall from rain gage R1
+# Control ONLY rainfall from rain gage R1 (plus ElapsedTime)
 python generate_mapping.py model.inp --input R1
 
-# Control multiple elements
+# Control ONLY these specific elements (plus ElapsedTime)
 python generate_mapping.py model.inp --input R1 --input PUMP1 --input J2
 ```
+
+**Important:** The `--input` flag specifies exactly which elements you want to control. If you don't use `--input`, you'll only have ElapsedTime as an input (no controllable elements).
 
 **Specify exact outputs you need:**
 ```bash
@@ -66,11 +68,14 @@ python generate_mapping.py model.inp --input R1 --output SUB1 --output POND1 --o
 ```
 
 **Available arguments:**
-- `--input` or `-i` : Add controllable input by element name (repeatable)
+- `--input` or `-i` : Specify controllable input by element name (repeatable)
+  - Only the elements you specify will be controllable inputs
+  - ElapsedTime is always included automatically as input[0]
   - Rain gages: Controls rainfall intensity
   - Pumps/Orifices/Weirs: Controls setting (0.0 to 1.0)
   - Junctions/Storage: Controls lateral inflow
-- `--output` or `-o` : Add output by element name (repeatable)
+- `--output` or `-o` : Specify output by element name (repeatable)
+  - Only the elements you specify will be outputs
   - If omitted, all elements are added as outputs
 - `--output-file` or `-f` : Specify output filename (default: SwmmGoldSimBridge.json)
 
