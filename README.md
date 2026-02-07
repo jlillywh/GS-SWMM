@@ -116,7 +116,7 @@ Create or open your SWMM model (`.inp` file) and verify it runs correctly in EPA
 
 ### Step 2: Generate Configuration File
 
-The bridge requires a JSON configuration file (`SwmmGoldSimBridge.json`) that maps SWMM elements to GoldSim inputs/outputs. Generate this file using the Python script:
+The bridge requires a JSON configuration file (`SwmmGoldSimBridge.json`) that maps SWMM elements to GoldSim inputs/outputs. You can start with an example and modify it yourself, or you can use the included Python script to generate this file:
 
 **Basic usage (auto-generates all outputs):**
 ```bash
