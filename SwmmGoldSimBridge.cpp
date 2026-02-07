@@ -9,7 +9,7 @@
 #include "include/swmm5.h"
 #include "include/MappingLoader.h"
 
-#define DLL_VERSION 5.212
+#define DLL_VERSION 1.05
 #define CONFIG_FILE "SwmmGoldSimBridge.json"
 #define PROPERTY_SKIP -1
 

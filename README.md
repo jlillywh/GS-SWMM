@@ -1,6 +1,6 @@
 # GS-SWMM: GoldSim-SWMM Bridge
 
-**Version 5.212** - Real-time coupling between GoldSim and EPA SWMM5
+**Version 1.05** - Real-time coupling between GoldSim and EPA SWMM5
 
 ## Overview
 
@@ -471,7 +471,7 @@ run_all_tests.bat
 
 ### For Developers: Custom SWMM5 Build for LID Support
 
-**⚠️ Note for Developers:** The LID output features in v5.212 require modifications to EPA SWMM5 source code. End users can use pre-built DLLs, but if you need to rebuild SWMM5:
+**⚠️ Note for Developers:** The LID output features in v1.05 require modifications to EPA SWMM5 source code. End users can use pre-built DLLs, but if you need to rebuild SWMM5:
 
 This version includes extensions to the EPA SWMM5 API that are **not in the standard SWMM5 release**. To use LID outputs, you must:
 
@@ -497,7 +497,7 @@ This version includes extensions to the EPA SWMM5 API that are **not in the stan
 |----|--------|-------------|
 | 0 | XF_INITIALIZE | Initialize SWMM model |
 | 1 | XF_CALCULATE | Run one time step |
-| 2 | XF_REP_VERSION | Return DLL version (5.202) |
+| 2 | XF_REP_VERSION | Return DLL version (1.05) |
 | 3 | XF_REP_ARGUMENTS | Return input/output counts from JSON |
 | 99 | XF_CLEANUP | Cleanup and release resources |
 
