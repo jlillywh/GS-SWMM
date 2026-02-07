@@ -1,4 +1,4 @@
-# GS-SWMM: GoldSim-SWMM Bridge
+``# GS-SWMM: GoldSim-SWMM Bridge
 
 **Version 1.05** - Real-time coupling between GoldSim and EPA SWMM5
 
@@ -26,7 +26,7 @@ GS-SWMM is a bridge DLL that enables real-time coupling between [GoldSim](https:
 - **Treatment train analysis** - Model water quality through series of LID practices
 - **Integrated modeling** - Combine stormwater hydraulics with watershed processes, economics, or risk analysis
 
-## What's New in v5.212
+## What's New in this version
 
 **LID API Extensions** - Access individual LID unit data for contaminant transport modeling:
 - Track storage volumes in rain barrels, infiltration trenches, planters, etc.
