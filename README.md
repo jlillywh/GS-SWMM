@@ -40,7 +40,11 @@ GS-SWMM is a bridge DLL that enables real-time coupling between [GoldSim](https:
 
 - **Windows 10 or 11** (64-bit)
 - **GoldSim 15.0 or later** ([Download GoldSim](https://www.goldsim.com/))
-- **EPA SWMM 5.2** (included with GS-SWMM release)
+- **GS-SWMM Bridge DLLs** (included in release):
+  - `GSswmm.dll` - Bridge interface (v1.05)
+  - `swmm5.dll` - Modified EPA SWMM 5.2.4 engine with LID API extensions
+
+**Note:** The included `swmm5.dll` contains custom modifications for LID output support. Do not replace it with the standard EPA SWMM DLL.
 
 ### Optional Tools
 
@@ -57,7 +61,7 @@ GS-SWMM is a bridge DLL that enables real-time coupling between [GoldSim](https:
 ### Compatibility Notes
 
 - **GoldSim versions**: Tested with GoldSim 15.x and 16.x
-- **SWMM versions**: Built against EPA SWMM 5.2.4 (included)
+- **SWMM versions**: Built against EPA SWMM 5.2.4 with custom LID extensions
 - **Operating System**: Windows only (SWMM API is Windows-specific)
 - **Architecture**: 64-bit only
 
