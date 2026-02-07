@@ -31,8 +31,6 @@ GS-SWMM is a bridge DLL that enables real-time coupling between [GoldSim](https:
 **LID API Extensions** - Access individual LID unit data for contaminant transport modeling:
 - Track storage volumes in rain barrels, infiltration trenches, planters, etc.
 - Monitor inflow, overflow, and drain flows from each LID unit
-- Model treatment trains with detailed mass balance
-- Complete water balance tracking for all LID types
 
 ## System Requirements
 
@@ -52,15 +50,9 @@ GS-SWMM is a bridge DLL that enables real-time coupling between [GoldSim](https:
   - Not required to run the examples (pre-generated configs included)
   - Used for `generate_mapping.py` script
 
-### Hardware
-
-- **Processor**: Any modern CPU (SWMM is single-threaded)
-- **Memory**: 4 GB RAM minimum, 8 GB recommended for large models
-- **Disk Space**: 100 MB for software, additional space for model outputs
-
 ### Compatibility Notes
 
-- **GoldSim versions**: Tested with GoldSim 15.x and 16.x
+- **GoldSim versions**: Tested with GoldSim 15
 - **SWMM versions**: Built against EPA SWMM 5.2.4 with custom LID extensions
 - **Operating System**: Windows only (SWMM API is Windows-specific)
 - **Architecture**: 64-bit only
