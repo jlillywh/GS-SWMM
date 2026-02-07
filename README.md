@@ -34,11 +34,11 @@ GS-SWMM is a bridge DLL that enables real-time coupling between [GoldSim](https:
 - Model treatment trains with detailed mass balance
 - Complete water balance tracking for all LID types
 
-## Quick Start
+## Getting Started
 
-### 1. Get Example Files
+### Try the Example Models
 
-Four complete examples are included in the release package ([Download Latest GS-SWMM Release](https://github.com/jlillywh/GSswmm/releases/latest)):
+Four complete working examples are included to help you understand how GS-SWMM works ([Download Latest Release](https://github.com/jlillywh/GSswmm/releases/latest)):
 
 **Example 1 - Simple Model**
 - Simple kinematic wave model with precipitation gage
@@ -71,9 +71,25 @@ Four complete examples are included in the release package ([Download Latest GS-
 - **Documentation:** See `LID Model.txt` included with the example for detailed model description
 - **Note:** This is the standard EPA SWMM LID example - refer to EPA SWMM documentation for LID design details
 
-Extract [Download Source Code (.zip)](https://github.com/jlillywh/GS-SWMM/archive/refs/heads/main.zip) to get started with any of these models.
+**To run an example:**
+1. Download and extract the release package
+2. Open the included GoldSim model (`.gsm` file)
+3. Press F5 to run
+4. Examine the results and model structure
 
-### 2. Generate Configuration File
+Each example includes all necessary files (DLLs, SWMM model, JSON config, GoldSim model).
+
+---
+
+## Building Your Own Integration
+
+Once you've explored the examples, follow these steps to integrate your own SWMM model with GoldSim:
+
+### Step 1: Prepare Your SWMM Model
+
+Create or open your SWMM model (`.inp` file) and verify it runs correctly in EPA SWMM.
+
+### Step 2: Generate Configuration File
 
 The bridge requires a JSON configuration file (`SwmmGoldSimBridge.json`) that maps SWMM elements to GoldSim inputs/outputs. Generate this file using the Python script:
 
@@ -184,7 +200,7 @@ This configuration:
 - **Output[1]**: POND storage volume (cubic feet)
 - **Output[2]**: OUT1 outfall flow (CFS)
 
-### 3. Copy Files to Your Working Directory
+### Step 3: Set Up Your Working Directory
 
 ```
 Your_Model_Directory/
@@ -192,10 +208,12 @@ Your_Model_Directory/
 ├── swmm5.dll                   (from release)
 ├── model.inp                   (your SWMM model)
 ├── SwmmGoldSimBridge.json      (generated in step 2)
-└── generate_mapping.py         (optional, for regenerating config)
+└── YourModel.gsm               (your GoldSim model)
 ```
 
-### 4. Configure GoldSim External Element
+### Step 4: Configure GoldSim External Element
+
+In GoldSim, add an External element with these settings:
 
 - **DLL File**: `GSswmm.dll`
 - **Function Name**: `SwmmGoldSimBridge` (case-sensitive!)
@@ -205,23 +223,29 @@ Your_Model_Directory/
 
 Click "Get Argument Info" to verify the input/output counts match your JSON configuration.
 
-### 5. Match Time Steps
+### Step 5: Match Time Steps
 
 **CRITICAL**: Set GoldSim's Basic Time Step to match SWMM's `ROUTING_STEP` in `model.inp`.
 
-Example models use different timesteps - check each model's `[OPTIONS]` section.
+Check your SWMM model's `[OPTIONS]` section for the routing step value.
 
 **IMPORTANT**: When using Dynamic Wave (DYNWAVE) routing, you must set `VARIABLE_STEP 0` in your SWMM model options to disable variable timesteps. Variable timesteps cause inconsistent results between standalone SWMM and API coupling. See "Variable Timestep Limitation" section below for details.
 
-### 6. Map Inputs/Outputs
+### Step 6: Connect Inputs and Outputs
 
-Check the `SwmmGoldSimBridge.json` file in your chosen example to see the input/output mapping. Each example has different elements being monitored and controlled.
+Map your GoldSim elements to the External element's inputs/outputs:
 
-The input/output indices in GoldSim must match the `index` values in your JSON file. The "Get Argument Info" button in GoldSim will show you the total counts.
+- **Input[0]**: Always ElapsedTime (connect to GoldSim's `ETime`)
+- **Input[1+]**: Your controllable elements (rainfall, pump settings, etc.)
+- **Outputs**: SWMM results (flows, volumes, depths, etc.)
 
-### 7. Run
+Check your `SwmmGoldSimBridge.json` file to see the exact mapping and indices.
+
+### Step 7: Run Your Simulation
 
 Press F5 or Simulation → Run.
+
+---
 
 ## How It Works
 
