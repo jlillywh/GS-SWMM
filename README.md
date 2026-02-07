@@ -411,70 +411,6 @@ The outputs appear in order in your GoldSim External element:
 - Output[2] = Planter drain flow
 - Output[3] = Planter overflow
 
-### Example: Complete LID Water Balance
-
-For a planter with underdrain, track the complete water balance:
-
-```json
-{
-  "outputs": [
-    {
-      "name": "S4/Planters",
-      "object_type": "LID",
-      "property": "SURFACE_INFLOW"
-    },
-    {
-      "name": "S4/Planters",
-      "object_type": "LID",
-      "property": "STORAGE_VOLUME"
-    },
-    {
-      "name": "S4/Planters",
-      "object_type": "LID",
-      "property": "DRAIN_FLOW"
-    },
-    {
-      "name": "S4/Planters",
-      "object_type": "LID",
-      "property": "SURFACE_OUTFLOW"
-    }
-  ]
-}
-```
-
-This tracks:
-- **Inflow** - Runoff entering the LID from the subcatchment
-- **Storage** - Water stored in the planter
-- **Drain Flow** - Treated water leaving through the underdrain
-- **Overflow** - Water overflowing when capacity is exceeded
-
-Use for mass balance: `Change in Storage = Inflow - Drain Flow - Overflow - Infiltration - Evaporation`
-
-For contaminant transport: `Load = Flow Rate × Concentration`
-
-### Example: LID Treatment Train
-
-For a subcatchment with multiple LID units in series:
-
-```
-[LID_USAGE]
-;;Subcatchment  LID_Process      Number  Area      Width
-S1              Bioswale         1       5000      10
-S1              DetentionPond    1       10000     50
-S1              RetentionPond    1       8000      40
-```
-
-Generate mapping:
-```bash
-python generate_mapping.py model.inp --input R1 --lid-outputs --output OUT1
-```
-
-This creates outputs for:
-- `S1/Bioswale` - Storage, inflow, overflow
-- `S1/DetentionPond` - Storage, inflow, overflow
-- `S1/RetentionPond` - Storage, inflow, overflow
-- `OUT1` - Final discharge flow
-
 In GoldSim, you can track water (and contaminant mass) through each treatment stage.
 
 ### LID Types and Their Outputs
@@ -528,7 +464,7 @@ run_all_tests.bat
 
 ### For Developers: Custom SWMM5 Build for LID Support
 
-**⚠️ Note for Developers:** The LID output features in v1.05 require modifications to EPA SWMM5 source code. End users can use pre-built DLLs, but if you need to rebuild SWMM5:
+**Note for Developers:** The LID output features in v1.05 require modifications to EPA SWMM5 source code. End users can use pre-built DLLs, but if you need to rebuild SWMM5:
 
 This version includes extensions to the EPA SWMM5 API that are **not in the standard SWMM5 release**. To use LID outputs, you must:
 
