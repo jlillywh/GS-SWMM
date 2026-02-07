@@ -38,7 +38,7 @@ GS-SWMM is a bridge DLL that enables real-time coupling between [GoldSim](https:
 
 ### 1. Get Example Files
 
-Three complete examples are included in the release package ([Download Latest GS-SWMM Release](https://github.com/jlillywh/GSswmm/releases/latest)):
+Four complete examples are included in the release package ([Download Latest GS-SWMM Release](https://github.com/jlillywh/GSswmm/releases/latest)):
 
 **Example 1 - Simple Model**
 - Simple kinematic wave model with precipitation gage
@@ -62,6 +62,14 @@ Three complete examples are included in the release package ([Download Latest GS
 - Uses deadband control based on pond water level
 - Demonstrates real-time structure control from GoldSim
 <img width="856" height="604" alt="image" src="https://github.com/user-attachments/assets/f046993a-eba5-4e53-90df-ebe8bad0feca" />
+
+**Example 4 - LID Treatment**
+- EPA SWMM "Low Impact Development" example model
+- Demonstrates green infrastructure (bioretention, rain gardens, permeable pavement)
+- Includes multiple LID units with detailed water balance tracking
+- GoldSim can monitor LID performance metrics (infiltration, evaporation, drainage)
+- **Documentation:** See `LID Model.txt` included with the example for detailed model description
+- **Note:** This is the standard EPA SWMM LID example - refer to EPA SWMM documentation for LID design details
 
 Extract [Download Source Code (.zip)](https://github.com/jlillywh/GS-SWMM/archive/refs/heads/main.zip) to get started with any of these models.
 
