@@ -1,4 +1,4 @@
-``# GS-SWMM: GoldSim-SWMM Bridge
+# GS-SWMM: GoldSim-SWMM Bridge
 
 **Version 1.05** - Real-time coupling between GoldSim and EPA SWMM5
 
