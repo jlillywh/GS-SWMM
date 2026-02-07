@@ -70,6 +70,8 @@ Four complete working examples are included to help you understand how GS-SWMM w
 - GoldSim can monitor LID performance metrics (infiltration, evaporation, drainage)
 - **Documentation:** See `LID Model.txt` included with the example for detailed model description
 - **Note:** This is the standard EPA SWMM LID example - refer to EPA SWMM documentation for LID design details
+<img width="1447" height="1000" alt="image" src="https://github.com/user-attachments/assets/041eb000-dfe2-4309-9498-44cc1f95b9c5" />
+
 
 **To run an example:**
 1. Download and extract the release package
