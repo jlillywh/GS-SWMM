@@ -34,6 +34,33 @@ GS-SWMM is a bridge DLL that enables real-time coupling between [GoldSim](https:
 - Model treatment trains with detailed mass balance
 - Complete water balance tracking for all LID types
 
+## System Requirements
+
+### Required Software
+
+- **Windows 10 or 11** (64-bit)
+- **GoldSim 15.0 or later** ([Download GoldSim](https://www.goldsim.com/))
+- **EPA SWMM 5.2** (included with GS-SWMM release)
+
+### Optional Tools
+
+- **Python 3.11 or later** - Only needed if you want to regenerate configuration files
+  - Not required to run the examples (pre-generated configs included)
+  - Used for `generate_mapping.py` script
+
+### Hardware
+
+- **Processor**: Any modern CPU (SWMM is single-threaded)
+- **Memory**: 4 GB RAM minimum, 8 GB recommended for large models
+- **Disk Space**: 100 MB for software, additional space for model outputs
+
+### Compatibility Notes
+
+- **GoldSim versions**: Tested with GoldSim 15.x and 16.x
+- **SWMM versions**: Built against EPA SWMM 5.2.4 (included)
+- **Operating System**: Windows only (SWMM API is Windows-specific)
+- **Architecture**: 64-bit only
+
 ## Getting Started
 
 ### Try the Example Models
